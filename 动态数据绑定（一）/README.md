@@ -1,4 +1,4 @@
-```javascirpt
+```javascript
 let app1 = new Observer({
   name: 'youngwind',
   age: 25
