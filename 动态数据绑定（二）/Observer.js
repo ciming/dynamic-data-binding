@@ -8,7 +8,6 @@ Event.prototype = {
             this.events[key] = [];
         }
         this.events[key].push(fun);
-        console.log(this.events[key])
     },
     trigger: function() {
         let key = Array.prototype.shift.call(arguments),
@@ -31,21 +30,19 @@ function Observer(data) {
 Observer.prototype = {
     //遍历对象
     walk: function(obj) {
-        let val;
-        for (let key in obj) {
-            if (obj.hasOwnProperty(key)) {
-                val = obj[key];
-                //任务一：添加遍历，
-                if (typeof val === 'object') {
-                    new Observer(val)
-                }
-                this.convert(key, val);
-            }
+        let keys = Object.keys(obj)
+        for (var i = 0, l = keys.length; i < l; i++) {
+            this.convert(keys[i], obj[keys[i]])
         }
     },
     //为对象的没一个属性绑定getter和setter
     convert: function(key, val) {
         let _this = this;
+        var property = Object.getOwnPropertyDescriptor(this.data, key);
+        if (property && property.configurable === false) {
+            return
+        }
+        let child = new Observer(val);
         Object.defineProperty(this.data, key, {
             enumerable: true,
             configurable: true,
@@ -54,19 +51,15 @@ Observer.prototype = {
                 return val
             },
             set: function(newVal) {
-                //任务二，如果newVal是对象的话， 
                 console.log('你设置了' + key);
                 console.log('新的' + key + ' = ' + newVal)
                 if (newVal === val) return;
-                //发布事件
-                _this.events.trigger(key, newVal)
-                val = newVal;
-                if (typeof newVal === 'object') {
-                    new Observer(newVal)
-                }
-
+                _this.events.trigger(key, newVal, val);
+                val = newVal
+                child = new Observer(newVal)
             }
         })
+
     },
     $watch: function(attr, callback) {
         //监听事件
