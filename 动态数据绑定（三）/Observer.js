@@ -12,6 +12,14 @@ Event.prototype = {
     emit: function() {
         let key = Array.prototype.shift.call(arguments),
             fns = this.events[key];
+
+        if (key.indexOf('.') !== -1) {
+            let parent = key.split('.');
+            for (var i = 0, l = parent.length; i < l; i++) {
+                let parentAttr = Array.prototype.slice.call(parent, 0, l - i - 1);
+                this.emit(parentAttr.join('.'), arguments);
+            }
+        }
         if (!fns || fns.length === 0) {
             return false;
         }
@@ -67,18 +75,7 @@ Observer.prototype = {
 
     },
     $watch: function(attr, callback) {
-        this.watch(this.data[attr], attr, callback)
-    },
-    watch: function(obj, attr, callback) {
         this.$event.on(attr, callback);
-        if (typeof obj === 'object') {
-            for (let key in obj) {
-                if (obj.hasOwnProperty(key)) {
-                    this.watch(obj[key], attr + '.' + key, callback);
-                }
-            }
-        }
-
     }
 }
 let app2 = new Observer({
