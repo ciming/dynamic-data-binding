@@ -29,6 +29,7 @@ Event.prototype = {
     }
 }
 
+
 function Observer(data, rawPath, observer) {
     this.data = data;
     this.rawPath = rawPath ? rawPath + '.' : '';
@@ -36,6 +37,7 @@ function Observer(data, rawPath, observer) {
     this.walk(data);
 
 }
+
 Observer.prototype = {
     walk: function(obj) {
         let keys = Object.keys(obj)
